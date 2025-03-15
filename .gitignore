@@ -1,0 +1,10 @@
+Library/
+Logs/
+Temp/
+Obj/
+Build/
+Builds/
+UserSettings/
+MemoryCaptures/
+.vs/
+.idea/
