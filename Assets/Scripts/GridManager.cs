@@ -79,34 +79,19 @@ public class GridManager : Singleton<GridManager>
         return nearestArea;
     }
     /// <summary>
-    /// Gets the neighboring areas of a given area in specified directions.
+    /// Returns the neighboring areas and their directions for a given area.
     /// </summary>
-    /// <param name="area">The reference area.</param>
+    /// <param name="area">The area whose neighbors will be found.</param>
     /// <param name="edgeDirections">The directions to check.</param>
-    /// <returns>A dictionary containing the neighboring areas with their respective directions.</returns>
+    /// <returns>A dictionary containing neighboring directions and their respective areas.</returns>
     public Dictionary<Direction, AreaController> GetNeighboringAreas(AreaController area, List<Direction> edgeDirections)
     {
-
         Dictionary<Direction, AreaController> neighbors = new Dictionary<Direction, AreaController>();
         Vector2Int areaIndex = area.Index;
+
         foreach (var direction in edgeDirections)
         {
-            Vector2Int neighborIndex = areaIndex;
-            switch (direction)
-            {
-                case Direction.Up:
-                    neighborIndex.x--;
-                    break;
-                case Direction.Down:
-                    neighborIndex.x++;
-                    break;
-                case Direction.Left:
-                    neighborIndex.y--;
-                    break;
-                case Direction.Right:
-                    neighborIndex.y++;
-                    break;
-            }
+            Vector2Int neighborIndex = GetNeighborIndex(areaIndex, direction);
 
             if (IsValidGridIndex(neighborIndex))
             {
@@ -115,6 +100,49 @@ public class GridManager : Singleton<GridManager>
         }
         return neighbors;
     }
+
+    /// <summary>
+    /// Returns the neighboring area in the specified direction.
+    /// </summary>
+    /// <param name="area">The area whose neighbor will be found.</param>
+    /// <param name="edgeDirection">The direction to check.</param>
+    /// <returns>The neighboring area or null if invalid.</returns>
+    public AreaController GetNeighboringArea(AreaController area, Direction edgeDirection)
+    {
+        Vector2Int neighborIndex = GetNeighborIndex(area.Index, edgeDirection);
+
+        if (IsValidGridIndex(neighborIndex))
+            return gridCells[neighborIndex.x, neighborIndex.y];
+
+        return null;
+    }
+
+    /// <summary>
+    /// Calculates the neighboring index in the given direction.
+    /// </summary>
+    /// <param name="currentIndex">The index of the current area.</param>
+    /// <param name="direction">The direction to move.</param>
+    /// <returns>The new neighboring index.</returns>
+    private Vector2Int GetNeighborIndex(Vector2Int currentIndex, Direction direction)
+    {
+        switch (direction)
+        {
+            case Direction.Up:
+                currentIndex.x--;
+                break;
+            case Direction.Down:
+                currentIndex.x++;
+                break;
+            case Direction.Left:
+                currentIndex.y--;
+                break;
+            case Direction.Right:
+                currentIndex.y++;
+                break;
+        }
+        return currentIndex;
+    }
+
     #endregion
     #region Grid Completion Check
 

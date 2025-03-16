@@ -8,7 +8,7 @@ using System;
 public class AreaController : SerializedMonoBehaviour
 {
     #region Fields
-    bool isCompleted;
+    public bool isCompleted;
     public bool IsCompleted => isCompleted;
     public Image background;
     private Vector2 position; 
@@ -40,8 +40,7 @@ public class AreaController : SerializedMonoBehaviour
     public void SetEdgeActive(Direction edgeDirection)
     {
         occupancyByDirection[edgeDirection] = true;
-        shapeEdges[edgeDirection].gameObject.SetActive(true);
-        shapeEdges[edgeDirection].edgeImage.color = shapeEdges[edgeDirection].edgeColor.SetAlpha(1);
+        shapeEdges[edgeDirection].SetEdgeActive(1);
         foreach (var item in cornerCheckers[edgeDirection])
             item.SetCornerActive(1,edgeDirection);
         CheckIfAllEdgesAreFilled();
@@ -51,9 +50,8 @@ public class AreaController : SerializedMonoBehaviour
     /// </summary>
     public void SetEdgeInactive(Direction edgeDirection)
     {
+        shapeEdges[edgeDirection].SetEdgeInactive(1);
         occupancyByDirection[edgeDirection] = false;
-        shapeEdges[edgeDirection].gameObject.SetActive(false);
-        shapeEdges[edgeDirection].edgeImage.color = shapeEdges[edgeDirection].edgeColor.SetAlpha(1);
         foreach (var item in cornerCheckers[edgeDirection])
             item.SetCornerInactive(1, edgeDirection);
     }
@@ -64,11 +62,19 @@ public class AreaController : SerializedMonoBehaviour
     private void ResetEdges()
     {
         List<Direction> allDirections = GridManager.Instance.allDirections;
-        for (int i = 0; i < Enum.GetNames(typeof(Direction)).Length; i++)
+        foreach (var direction in allDirections)
         {
-            SetEdgeInactive((Direction)i);
-            foreach (var item in GridManager.Instance.GetNeighboringAreas(this, allDirections))
-                item.Value.SetEdgeInactive(Extensions.GetOppositeDirection(item.Key));
+            AreaController neighboringArea = GridManager.Instance.GetNeighboringArea(this, direction);
+            if(neighboringArea != null)
+            {
+                if(!neighboringArea.isCompleted)
+                {
+                    SetEdgeInactive(direction);
+                    neighboringArea.SetEdgeInactive(Extensions.GetOppositeDirection(direction));
+                }
+            }
+            else
+                SetEdgeInactive(direction);
         }
     }
     #endregion
@@ -123,13 +129,13 @@ public class AreaController : SerializedMonoBehaviour
     /// </summary>
     public void ClearCompletedArea()
     {
-
+        Vector3 initialPosition = transform.position;
+        isCompleted = false;
         transform.DOShakePosition(.3f, 7, 25).OnComplete(() =>
         {
+            transform.position = initialPosition;
             ResetEdges();
             background.transform.DOScale(Vector3.zero, .3f).OnComplete(() => background.enabled = false);
-            isCompleted = false;
-
         });
 
     }
@@ -139,6 +145,10 @@ public class AreaController : SerializedMonoBehaviour
     public void FillAllEdgesForTest()
     {
         for (int i = 0; i < Enum.GetNames(typeof(Direction)).Length; i++)
+        {
             SetEdgeActive((Direction)i);
+            foreach (var neighbor in GridManager.Instance.GetNeighboringAreas(this, new List<Direction> { (Direction)i }))
+                neighbor.Value.SetEdgeActive(Extensions.GetOppositeDirection(neighbor.Key));
+        }
     }
 }

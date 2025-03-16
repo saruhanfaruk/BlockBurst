@@ -1,0 +1,12 @@
+# ninja log v5
+48	360	7637543131924468	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	284426a6e7877fda
+362	522	7637543133618708	D:/UnityProjeler/Block Burst/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/2j8593m1/obj/arm64-v8a/libswappywrapper.so	d5bdbe52b87e0406
+30	1016	7637543138475931	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	672a3cf7f7856917
+19	1031	7637543138640003	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	e613866a591aa75e
+1	1046	7637543138762448	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	cbec18d21bd126bc
+36	1051	7637543138863223	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	6a6c13581cb10613
+42	1121	7637543139510272	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	d96473897a2d0e84
+12	1156	7637543139896762	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	c2f773b2ab92edad
+24	1314	7637543141468480	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	b87b7b08ebca8ccd
+7	1407	7637543142327474	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	86a48216afee8aa
+1407	1528	7637543143698685	D:/UnityProjeler/Block Burst/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/2j8593m1/obj/arm64-v8a/libgame.so	aa88fd21b7e01282

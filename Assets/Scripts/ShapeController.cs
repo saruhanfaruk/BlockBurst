@@ -3,7 +3,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ShapeController : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class ShapeController : MonoBehaviour, IDragHandler, IPointerDownHandler,IPointerUpHandler
 {
     #region Fields
 
@@ -18,6 +18,7 @@ public class ShapeController : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private RectTransform rectTransform;
     private Camera uiCamera;
     private Vector2 dragOffset;
+    private Vector2 startingOffSet;
     private AreaController lastPreviewArea;
     private Vector3 startPos;
 
@@ -30,20 +31,38 @@ public class ShapeController : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         rectTransform = GetComponent<RectTransform>();
         uiCamera = UIManager.Instance.uiCamera;
         startPos = rectTransform.position;
+        startingOffSet = new Vector2(0, 1);
+    }
+
+    #endregion
+
+    #region Pointer
+    /// <summary>
+    /// Called when the pointer is pressed down on the shape.
+    /// Captures the initial drag offset and updates the shape's position.
+    /// </summary>
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        RectTransformUtility.ScreenPointToWorldPointInRectangle(rectTransform, eventData.position, uiCamera, out Vector3 worldPoint);
+        dragOffset = (Vector2)rectTransform.position - (Vector2)worldPoint;
+        rectTransform.position = worldPoint + (Vector3)dragOffset + (Vector3)startingOffSet;
+    }
+    /// <summary>
+    /// Called when the pointer is released from the shape.
+    /// Finalizes the shape's position and handles the drop logic.
+    /// </summary>
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rectTransform, eventData.position, uiCamera, out Vector3 worldPoint))
+        {
+            rectTransform.position = worldPoint + (Vector3)dragOffset + (Vector3)startingOffSet;
+            HandleDrop();
+        }
     }
 
     #endregion
 
     #region Drag Operations
-
-    /// <summary>
-    /// Handles the beginning of the drag operation.
-    /// </summary>
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        RectTransformUtility.ScreenPointToWorldPointInRectangle(rectTransform, eventData.position, uiCamera, out Vector3 worldPoint);
-        dragOffset = (Vector2)rectTransform.position - (Vector2)worldPoint;
-    }
 
     /// <summary>
     /// Handles the dragging logic.
@@ -52,20 +71,8 @@ public class ShapeController : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rectTransform, eventData.position, uiCamera, out Vector3 worldPoint))
         {
-            rectTransform.position = worldPoint + (Vector3)dragOffset;
+            rectTransform.position = worldPoint + (Vector3)dragOffset + (Vector3)startingOffSet;
             UpdatePreviewArea();
-        }
-    }
-
-    /// <summary>
-    /// Handles the end of the drag operation.
-    /// </summary>
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rectTransform, eventData.position, uiCamera, out Vector3 worldPoint))
-        {
-            rectTransform.position = worldPoint + (Vector3)dragOffset;
-            HandleDrop();
         }
     }
 
@@ -129,9 +136,12 @@ public class ShapeController : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         foreach (var direction in edgeControlDirections)
             areaController.SetEdgeActive(direction);
-
         foreach (var neighbor in GridManager.Instance.GetNeighboringAreas(areaController, edgeControlDirections))
+        {
+            //Debug.Log("Komþu Ýsmi: " + neighbor.Value.name + "   Direction: " + Extensions.GetOppositeDirection(neighbor.Key) + "    Hedef Area: " + areaController.name);
             neighbor.Value.SetEdgeActive(Extensions.GetOppositeDirection(neighbor.Key));
+        }
+            
     }
 
     #endregion
